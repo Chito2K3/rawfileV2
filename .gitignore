@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Hospital raw data & generated cleaned outputs (keep private / out of git)
+OUTPUT_CLEANED/
+raw file/
+*.xls
+*.xlsx
+*.xlsm
+*.csv
+
+# OS / Editor
+.DS_Store
+Thumbs.db

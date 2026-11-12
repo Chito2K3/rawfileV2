@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HIS File Cleaner &amp; Daily Final Results</title>
+  <style>
+    :root {
+      --bg: #eef3f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafd;
+      --border: #dce4f0;
+      --text: #152236;
+      --muted: #5b6c84;
+      --primary: #2155cd;
+      --primary-hover: #1842a6;
+      --primary-soft: #eaf1ff;
+      --success: #0e7c47;
+      --success-soft: #e6f7ee;
+      --success-border: #9adbb9;
+      --warn: #b45309;
+      --warn-soft: #fef3c7;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --purple: #6d28d9;
+      --purple-soft: #f3e8ff;
+      --teal: #0f766e;
+      --teal-soft: #e0f7f4;
+      --radius: 14px;
+      --shadow: 0 4px 18px rgba(15, 29, 58, 0.06);
+      --shadow-sm: 0 1px 4px rgba(15, 29, 58, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      background: linear-gradient(135deg, #0b1d3d 0%, #14366b 58%, #0f4e63 100%);
+      color: #ffffff;
+      padding: 15px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: 0 4px 16px rgba(8, 20, 44, 0.18);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17.5px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+    }
+
+    .brand p {
+      margin: 1px 0 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(110, 231, 183, 0.42);
+      color: #d1fae5;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .mode-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+    }
+
+    .btn-top {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-top:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .container {
+      max-width: 1220px;
+      margin: 22px auto;
+      padding: 0 22px 44px;
+      display: grid;
+      grid-template-columns: 1.48fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 22px;
+    }
+
+    .card + .card {
+      margin-top: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .card-subtitle {
+      margin: 3px 0 0;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .org-bar {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 12px;
+      align-items: end;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 680px) {
+      .org-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+    }
+
+    .field input[type="text"],
+    .field input[type="date"],
+    .field input[type="month"] {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13.5px;
+      background: #ffffff;
+      color: var(--text);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(33, 85, 205, 0.14);
+    }
+
+    .month-sync-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .month-sync-row input[type="month"] {
+      flex: 1 1 138px;
+      min-width: 138px;
+    }
+
+    .month-sync-row input[type="text"] {
+      flex: 1 1 155px;
+      min-width: 155px;
+      font-weight: 600;
+    }
+
+    .upload-section-group {
+      margin-top: 15px;
+    }
+
+    .upload-section-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #42546e;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-dest-pill {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eef3fb;
+      color: #36507a;
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .slot-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .slot-card {
+      border: 1.5px dashed #c4d1e4;
+      border-radius: 12px;
+      background: var(--surface-alt);
+      padding: 13px 14px;
+      cursor: pointer;
+      transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .slot-card:hover {
+      border-color: #7ea3dc;
+      background: #f4f8ff;
+      transform: translateY(-1px);
+    }
+
+    .slot-card.dragover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      box-shadow: 0 0 0 3px rgba(33, 85, 205, 0.14);
+      transform: scale(1.01);
+    }
+
+    .slot-card.has-files {
+      border-style: solid;
+      border-color: var(--success-border);
+      background: #f5fcf8;
+    }
+
+    .slot-card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .slot-icon {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #d7e2f3;
+      background: #ffffff;
+      color: var(--primary);
+    }
+
+    .slot-icon.issuance {
+      color: var(--teal);
+      border-color: #c5eae4;
+    }
+
+    .slot-icon.generic {
+      color: #475569;
+      border-color: #dce3ee;
+    }
+
+    .slot-card.has-files .slot-icon {
+      border-color: var(--success-border);
+      color: var(--success);
+      background: #ecfdf5;
+    }
+
+    .slot-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .slot-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .slot-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+
+    .slot-count-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .slot-hint {
+      font-size: 11.5px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .slot-files {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .slot-file-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid #ccebd9;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    .slot-file-name {
+      font-weight: 600;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slot-file-remove {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .slot-file-remove:hover {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .actions-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid #ebf0f7;
+    }
+
+    /* Animated Progress Bar */
+    .progress-wrap {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f4f8ff;
+      border: 1px solid #cfe0fa;
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1e3a6e;
+    }
+
+    .progress-pct {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #dce8fb;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2155cd 0%, #0f766e 50%, #2155cd 100%);
+      background-size: 200% 100%;
+      transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: shimmerBar 1.3s linear infinite;
+    }
+
+    .progress-fill.done {
+      background: linear-gradient(90deg, #10b981, #0e7c47);
+      animation: none;
+    }
+
+    @keyframes shimmerBar {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.14s ease, border-color 0.14s ease, transform 0.1s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--surface-alt);
+      border-color: #b4c2d6;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2155cd, #1a47b0);
+      border-color: #1a47b0;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(33, 85, 205, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1a47b0, #153a91);
+      border-color: #153a91;
+    }
+
+    .btn-teal {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #ffffff;
+    }
+
+    .btn-teal:hover:not(:disabled) {
+      background: #0c5f59;
+      border-color: #0c5f59;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 7px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .badge-detailed_ancillary {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .badge-consumption_summary {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    .badge-issuance_matrix {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .badge-generic_table {
+      background: #eef2f6;
+      color: #334155;
+    }
+
+    .badge-combined {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .badge-slot {
+      background: #edf2f9;
+      color: #314663;
+      margin-right: 4px;
+    }
+
+    .alert {
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      border: 1px solid transparent;
+    }
+
+    .alert-warn {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-color: #fde68a;
+    }
+
+    .alert-error {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .alert-success {
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: #bbf7d0;
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .kpi-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-box {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.4px;
+    }
+
+    .kpi-val {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .result-block {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px 14px;
+      background: var(--surface-alt);
+      margin-bottom: 10px;
+    }
+
+    .result-block.combined-highlight {
+      background: #f2fbf6;
+      border-color: #b7e6cc;
+    }
+
+    .result-block.issuance-highlight {
+      background: #f2fbfa;
+      border-color: #b8e6e0;
+    }
+
+    .result-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .result-name {
+      font-weight: 700;
+      font-size: 13.5px;
+      word-break: break-word;
+    }
+
+    .result-stats {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .download-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .pill-link:hover {
+      background: var(--primary-soft);
+      border-color: #aac4f8;
+    }
+
+    .explorer-month {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .explorer-month-head {
+      background: var(--surface-alt);
+      padding: 10px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .explorer-month-name {
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .explorer-body {
+      padding: 10px 12px;
+      background: #ffffff;
+    }
+
+    .subfolder-box {
+      border-left: 3px solid #96b8f2;
+      padding-left: 10px;
+      margin-top: 10px;
+    }
+
+    .subfolder-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #26416b;
+    }
+
+    .file-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+      border-bottom: 1px dashed #edf1f7;
+    }
+
+    .file-line:last-child {
+      border-bottom: none;
+    }
+
+    .file-line a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .file-line a:hover {
+      text-decoration: underline;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="8" y1="13" x2="16" y2="13"/>
+          <line x1="8" y1="17" x2="13" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <h1>HIS File Cleaner &amp; Daily Final Results</h1>
+        <p>Unmerge raw HIS exports, combine Consumption, separate Storage &amp; Dispensing Issuance</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="mode-pill"><span class="mode-dot"></span>Daily Final Results Mode</span>
+      <button type="button" class="btn-top" id="btnOpenRoot">Open Output Root</button>
+      <button type="button" class="btn-top" id="btnRefreshOutputs">Refresh</button>
+    </div>
+  </header>
+
+  <div id="staleServerBanner" class="alert alert-error hidden" style="max-width:1220px; margin:16px auto 0; padding:12px 18px;">
+    <strong>Server restart required:</strong> An older background server process is still running on port 5055. Close the old server terminal window and re-run <code>launch_cleaner.bat</code> so the latest fixes take effect.
+  </div>
+
+  <main class="container">
+    <section>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title"><span class="step-num">1</span> Raw Downloaded HIS Files</h2>
+            <p class="card-subtitle">
+              Drop daily files into their matching cards &mdash; outputs save cleanly inside <code>DAILY_FINAL_RESULTS/</code>.
+            </p>
+          </div>
+          <span class="muted">Drag &amp; drop or click any card</span>
+        </div>
+
+        <div class="org-bar">
+          <div class="field">
+            <label for="monthFolder">Output Subfolder (Month)</label>
+            <div class="month-sync-row">
+              <input type="month" id="monthPicker" title="Sync month folder name" />
+              <input type="text" id="monthFolder" placeholder="CLEANED_2026_11" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="dateInput">File Date (YYYY-MM-DD)</label>
+            <input type="date" id="dateInput" />
+          </div>
+        </div>
+
+        <div class="upload-section-group">
+          <div class="upload-section-label">
+            <span>A. Daily Consumption Reports</span>
+            <span class="section-dest-pill">&rarr; CONSUMPTION_COMBINED_CLEANED</span>
+          </div>
+          <div class="slot-grid">
+            <div class="slot-card" data-slot="overall_consumption" tabindex="0">
+              <div class="slot-card-head">
+                <div class="slot-icon" aria-hidden="true">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M9 15l2 2 4-4"/>
+                  </svg>
+                </div>
+                <div class="slot-meta">
+                  <div class="slot-title-row">
+                    <span class="slot-title">Overall Consumption</span>
+                    <span class="slot-count-badge hidden"></span>
+                  </div>
+                  <div class="slot-hint">e.g. CONSUMP_ANCILLIARY_DAILY.xls</div>
+                </div>
+              </div>
+              <div class="slot-files"></div>
+              <input type="file" multiple accept=".xls,.xlsx,.xlsm,.csv,.tsv" class="hidden" />
+            </div>
+
+            <div class="slot-card" data-slot="consignment_consumption" tabindex="0">
+              <div class="slot-card-head">
+                <div class="slot-icon" aria-hidden="true">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                </div>
+                <div class="slot-meta">
+                  <div class="slot-title-row">
+                    <span class="slot-title">Consignment Consumption</span>
+                    <span class="slot-count-badge hidden"></span>
+                  </div>
+                  <div class="slot-hint">e.g. CONS_CONSUMP_DAILY.xls/.xlsx</div>
+                </div>
+              </div>
+              <div class="slot-files"></div>
+              <input type="file" multiple accept=".xls,.xlsx,.xlsm,.csv,.tsv" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-section-group">
+          <div class="upload-section-label">
+            <span>B. Daily Issuance Matrices</span>
+            <span class="section-dest-pill">&rarr; Separate Storage &amp; Dispensing Files</span>
+          </div>
+          <div class="slot-grid">
+            <div class="slot-card" data-slot="storage_issuance" tabindex="0">
+              <div class="slot-card-head">
+                <div class="slot-icon issuance" aria-hidden="true">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                </div>
+                <div class="slot-meta">
+                  <div class="slot-title-row">
+                    <span class="slot-title">Storage Issuance</span>
+                    <span class="slot-count-badge hidden"></span>
+                  </div>
+                  <div class="slot-hint">e.g. issuance_storage_daily.csv</div>
+                </div>
+              </div>
+              <div class="slot-files"></div>
+              <input type="file" multiple accept=".xls,.xlsx,.xlsm,.csv,.tsv" class="hidden" />
+            </div>
+
+            <div class="slot-card" data-slot="dispensing_issuance" tabindex="0">
+              <div class="slot-card-head">
+                <div class="slot-icon issuance" aria-hidden="true">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="15" y1="21" x2="15" y2="9"/>
+                  </svg>
+                </div>
+                <div class="slot-meta">
+                  <div class="slot-title-row">
+                    <span class="slot-title">Dispensing Issuance</span>
+                    <span class="slot-count-badge hidden"></span>
+                  </div>
+                  <div class="slot-hint">e.g. issuance_disp_daily.csv</div>
+                </div>
+              </div>
+              <div class="slot-files"></div>
+              <input type="file" multiple accept=".xls,.xlsx,.xlsm,.csv,.tsv" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-section-group">
+          <div class="upload-section-label">
+            <span>C. Other HIS Tables (Optional)</span>
+            <span class="section-dest-pill">&rarr; OTHER_TABLES/</span>
+          </div>
+          <div class="slot-card" data-slot="other_files" tabindex="0">
+            <div class="slot-card-head">
+              <div class="slot-icon generic" aria-hidden="true">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <div class="slot-meta">
+                <div class="slot-title-row">
+                  <span class="slot-title">Other Merged HIS Excel / CSV Files</span>
+                  <span class="slot-count-badge hidden"></span>
+                </div>
+                <div class="slot-hint">Auto-detects header row, unmerges cells, strips banners &amp; footers</div>
+              </div>
+            </div>
+            <div class="slot-files"></div>
+            <input type="file" multiple accept=".xls,.xlsx,.xlsm,.csv,.tsv" class="hidden" />
+          </div>
+        </div>
+
+        <div id="cleanProgressWrap" class="progress-wrap hidden" aria-live="polite">
+          <div class="progress-header">
+            <span id="cleanProgressLabel">Preparing files...</span>
+            <span id="cleanProgressPct" class="progress-pct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="cleanProgressFill" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <span class="muted" id="targetPreview"></span>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn hidden" id="btnClearQueue">Clear All</button>
+            <button type="button" class="btn btn-primary" id="btnClean" disabled>Clean &amp; Process Files</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden" id="resultsCard">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title"><span class="step-num">2</span> Cleaned Results</h2>
+            <p class="card-subtitle" id="resultsSubtitle"></p>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm" id="btnResultOpenFolder">Open Folder</button>
+            <a class="btn btn-sm" id="btnResultZip" href="#">Download All ZIP</a>
+            <button type="button" class="btn btn-sm btn-teal hidden" id="btnResultCombineMonth">Combine Whole Month</button>
+          </div>
+        </div>
+
+        <div id="resultsAlerts"></div>
+        <div id="resultsKpis" class="kpi-strip hidden"></div>
+        <div id="resultsCombined"></div>
+        <div id="resultsFiles"></div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Outputs Explorer</h2>
+            <p class="card-subtitle" id="outputRootLabel">OUTPUT_CLEANED/</p>
+          </div>
+        </div>
+        <div id="outputsTree">
+          <p class="muted">Loading cleaned folders...</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      const EXPECTED_BACKEND = "2026-11-12-v7";
+
+      const monthPicker = document.getElementById("monthPicker");
+      const monthFolderInput = document.getElementById("monthFolder");
+      const dateInput = document.getElementById("dateInput");
+      const targetPreview = document.getElementById("targetPreview");
+
+      const slotCards = Array.from(document.querySelectorAll(".slot-card[data-slot]"));
+      const btnClearQueue = document.getElementById("btnClearQueue");
+      const btnClean = document.getElementById("btnClean");
+
+      const cleanProgressWrap = document.getElementById("cleanProgressWrap");
+      const cleanProgressLabel = document.getElementById("cleanProgressLabel");
+      const cleanProgressPct = document.getElementById("cleanProgressPct");
+      const cleanProgressFill = document.getElementById("cleanProgressFill");
+
+      const resultsCard = document.getElementById("resultsCard");
+      const resultsSubtitle = document.getElementById("resultsSubtitle");
+      const resultsAlerts = document.getElementById("resultsAlerts");
+      const resultsKpis = document.getElementById("resultsKpis");
+      const resultsCombined = document.getElementById("resultsCombined");
+      const resultsFiles = document.getElementById("resultsFiles");
+      const btnResultOpenFolder = document.getElementById("btnResultOpenFolder");
+      const btnResultZip = document.getElementById("btnResultZip");
+      const btnResultCombineMonth = document.getElementById("btnResultCombineMonth");
+
+      const btnOpenRoot = document.getElementById("btnOpenRoot");
+      const btnRefreshOutputs = document.getElementById("btnRefreshOutputs");
+      const outputsTree = document.getElementById("outputsTree");
+      const outputRootLabel = document.getElementById("outputRootLabel");
+
+      const slotFiles = {
+        overall_consumption: [],
+        consignment_consumption: [],
+        storage_issuance: [],
+        dispensing_issuance: [],
+        other_files: [],
+      };
+      let lastTargetFolder = "";
+      let lastMonthFolder = "";
+      let progressTimer = null;
+
+      function initDates() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        monthPicker.value = `${yyyy}-${mm}`;
+        monthFolderInput.value = `CLEANED_${yyyy}_${mm}`;
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+        updateTargetPreview();
+      }
+
+      function updateTargetPreview() {
+        const month = (monthFolderInput.value || "CLEANED").trim();
+        const dt = dateInput.value || "YYYY-MM-DD";
+        targetPreview.textContent = `Target: OUTPUT_CLEANED/${month}/DAILY_FINAL_RESULTS/ (*_${dt}.xlsx / .csv)`;
+      }
+
+      monthPicker.addEventListener("change", () => {
+        if (monthPicker.value) {
+          monthFolderInput.value = `CLEANED_${monthPicker.value.replace("-", "_")}`;
+          updateTargetPreview();
+        }
+      });
+      monthFolderInput.addEventListener("input", updateTargetPreview);
+      dateInput.addEventListener("change", updateTargetPreview);
+
+      function formatBytes(bytes) {
+        if (!bytes) return "0 B";
+        const units = ["B", "KB", "MB", "GB"];
+        let idx = 0;
+        let val = bytes;
+        while (val >= 1024 && idx < units.length - 1) {
+          val /= 1024;
+          idx++;
+        }
+        return `${val.toFixed(idx === 0 ? 0 : 1)} ${units[idx]}`;
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function totalQueuedCount() {
+        return Object.values(slotFiles).reduce((sum, list) => sum + list.length, 0);
+      }
+
+      function renderSlots() {
+        const total = totalQueuedCount();
+        btnClearQueue.classList.toggle("hidden", total === 0);
+        btnClean.disabled = total === 0;
+
+        for (const card of slotCards) {
+          const slot = card.getAttribute("data-slot");
+          const files = slotFiles[slot] || [];
+          const container = card.querySelector(".slot-files");
+          const countBadge = card.querySelector(".slot-count-badge");
+          card.classList.toggle("has-files", files.length > 0);
+          if (countBadge) {
+            countBadge.classList.toggle("hidden", files.length === 0);
+            countBadge.textContent = files.length === 1 ? "1 file" : `${files.length} files`;
+          }
+
+          container.innerHTML = files
+            .map((f, idx) => `
+              <div class="slot-file-pill">
+                <span class="slot-file-name">${escapeHtml(f.name)} <span class="muted">(${formatBytes(f.size)})</span></span>
+                <button type="button" class="slot-file-remove" data-slot="${escapeHtml(slot)}" data-idx="${idx}" title="Remove">&times;</button>
+              </div>
+            `)
+            .join("");
+
+          container.querySelectorAll(".slot-file-remove").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const s = btn.getAttribute("data-slot");
+              const i = Number(btn.getAttribute("data-idx"));
+              slotFiles[s].splice(i, 1);
+              renderSlots();
+            });
+          });
+        }
+      }
+
+      function addFilesToSlot(slot, fileList) {
+        if (!slotFiles[slot]) slotFiles[slot] = [];
+        const incoming = Array.from(fileList || []);
+        for (const f of incoming) {
+          const exists = slotFiles[slot].some((q) => q.name === f.name && q.size === f.size);
+          if (!exists) slotFiles[slot].push(f);
+        }
+        renderSlots();
+      }
+
+      function clearAllSlots() {
+        for (const key of Object.keys(slotFiles)) {
+          slotFiles[key] = [];
+        }
+        renderSlots();
+      }
+
+      for (const card of slotCards) {
+        const slot = card.getAttribute("data-slot");
+        const input = card.querySelector('input[type="file"]');
+
+        card.addEventListener("click", () => input.click());
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            input.click();
+          }
+        });
+        input.addEventListener("change", () => {
+          addFilesToSlot(slot, input.files);
+          input.value = "";
+        });
+        card.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          card.classList.add("dragover");
+        });
+        card.addEventListener("dragleave", () => card.classList.remove("dragover"));
+        card.addEventListener("drop", (e) => {
+          e.preventDefault();
+          card.classList.remove("dragover");
+          addFilesToSlot(slot, e.dataTransfer.files);
+        });
+      }
+
+      btnClearQueue.addEventListener("click", clearAllSlots);
+
+      function setProgress(pct, label, isDone) {
+        const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+        cleanProgressWrap.classList.remove("hidden");
+        cleanProgressFill.style.width = `${clamped}%`;
+        cleanProgressFill.classList.toggle("done", Boolean(isDone));
+        cleanProgressPct.textContent = `${clamped}%`;
+        cleanProgressLabel.textContent = label;
+      }
+
+      function stopProgressSimulation() {
+        if (progressTimer) {
+          clearInterval(progressTimer);
+          progressTimer = null;
+        }
+      }
+
+      function startProcessingProgress() {
+        stopProcessingProgress();
+        let current = 36;
+        setProgress(current, "Unmerging cells & detecting HIS formats...", false);
+        progressTimer = setInterval(() => {
+          if (current < 62) {
+            current += 4;
+            setProgress(current, "Unmerging cells & cleaning HIS rows...", false);
+          } else if (current < 88) {
+            current += 2;
+            setProgress(current, "Combining Consumption & styling .xlsx / .csv...", false);
+          } else if (current < 93) {
+            current += 1;
+            setProgress(current, "Finalizing DAILY_FINAL_RESULTS files...", false);
+          }
+        }, 180);
+      }
+
+      function stopProcessingProgress() {
+        stopProgressSimulation();
+      }
+
+      function renderDownloadPills(outputs) {
+        return (outputs || [])
+          .map((o) => `
+            <a class="pill-link" href="/api/download_file?path=${encodeURIComponent(o.relative_path)}">
+              <span>&#11015;</span>
+              <span>${escapeHtml(o.filename)}</span>
+              <span class="muted">(${formatBytes(o.size_bytes)})</span>
+            </a>
+          `)
+          .join("");
+      }
+
+      function renderCombinedCards(combinedList, labelPrefix) {
+        if (!combinedList || combinedList.length === 0) return "";
+        const kindLabels = {
+          consumption: "Consumption Combined",
+          issuance_storage: "Storage Issuance Combined",
+          issuance_dispensing: "Dispensing Issuance Combined",
+          issuance: "Issuance Combined",
+        };
+        return combinedList
+          .map((c) => {
+            const title = `${labelPrefix} ${kindLabels[c.kind] || "Combined"}`;
+            return `
+              <div class="result-block combined-highlight">
+                <div class="result-top">
+                  <span class="result-name">${escapeHtml(title)}</span>
+                  <span class="badge badge-combined">Combined Rollup</span>
+                </div>
+                <div class="result-stats">
+                  Source files: <strong>${c.source_files}</strong> &middot;
+                  Unique items: <strong>${c.item_count}</strong> &middot;
+                  Total Qty: <strong>${c.total_quantity}</strong>
+                </div>
+                <div class="download-pills">${renderDownloadPills(c.outputs)}</div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function renderKpis(data) {
+        const filesCount = (data.files || []).length;
+        const combinedItems = (data.combined || []).reduce((acc, c) => acc + (c.item_count || 0), 0);
+        const issuanceFiles = (data.files || []).filter(
+          (f) => f.detected_format === "issuance_matrix" && (f.outputs || []).length > 0
+        ).length;
+
+        resultsKpis.classList.remove("hidden");
+        resultsKpis.innerHTML = `
+          <div class="kpi-box">
+            <div class="kpi-label">Inputs Processed</div>
+            <div class="kpi-val">${filesCount}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Combined Consumption Items</div>
+            <div class="kpi-val">${combinedItems}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Separate Issuance Files</div>
+            <div class="kpi-val">${issuanceFiles}</div>
+          </div>
+        `;
+      }
+
+      function uploadWithProgress(form) {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/api/clean", true);
+
+          xhr.upload.onprogress = (evt) => {
+            if (evt.lengthComputable && evt.total > 0) {
+              const upPct = (evt.loaded / evt.total) * 34;
+              setProgress(upPct, "Uploading raw HIS files...", false);
+            }
+          };
+          xhr.upload.onload = () => {
+            startProcessingProgress();
+          };
+          xhr.onload = () => {
+            stopProcessingProgress();
+            try {
+              const json = JSON.parse(xhr.responseText || "{}");
+              resolve({ ok: xhr.status >= 200 && xhr.status < 300, data: json });
+            } catch (e) {
+              reject(new Error("Invalid server JSON response."));
+            }
+          };
+          xhr.onerror = () => {
+            stopProcessingProgress();
+            reject(new Error("Network error communicating with local server."));
+          };
+          xhr.send(form);
+        });
+      }
+
+      async function cleanQueuedFiles() {
+        if (totalQueuedCount() === 0) return;
+        btnClean.disabled = true;
+        btnClean.textContent = "Cleaning...";
+        setProgress(5, "Uploading raw HIS files...", false);
+
+        const form = new FormData();
+        form.append("month_folder", (monthFolderInput.value || "").trim());
+        form.append("date_str", dateInput.value || "");
+        for (const [slot, files] of Object.entries(slotFiles)) {
+          for (const f of files) {
+            form.append(slot, f, f.name);
+          }
+        }
+
+        try {
+          const { ok, data } = await uploadWithProgress(form);
+          if (!ok || !data.ok) {
+            cleanProgressWrap.classList.add("hidden");
+            resultsCard.classList.remove("hidden");
+            resultsKpis.classList.add("hidden");
+            resultsAlerts.innerHTML = `<div class="alert alert-error">${escapeHtml(data.error || "Cleaning failed.")}</div>`;
+            return;
+          }
+
+          setProgress(100, "Cleaning complete! Results saved to DAILY_FINAL_RESULTS.", true);
+          setTimeout(() => {
+            cleanProgressWrap.classList.add("hidden");
+          }, 2200);
+
+          lastTargetFolder = data.target_folder;
+          lastMonthFolder = data.month_folder;
+
+          resultsCard.classList.remove("hidden");
+          resultsSubtitle.textContent = `Saved in OUTPUT_CLEANED/${data.target_folder}/ (${data.date_str})`;
+          btnResultZip.href = `/api/download_zip?folder=${encodeURIComponent(data.target_folder)}`;
+          btnResultCombineMonth.classList.remove("hidden");
+
+          const warnHtml = (data.warnings || [])
+            .map((w) => `<div class="alert alert-warn">${escapeHtml(w)}</div>`)
+            .join("");
+          resultsAlerts.innerHTML = warnHtml || `<div class="alert alert-success">Cleaned ${data.files.length} file(s) for ${escapeHtml(data.date_str)}.</div>`;
+
+          renderKpis(data);
+          resultsCombined.innerHTML = renderCombinedCards(data.combined, `Daily (${data.date_str})`);
+          resultsFiles.innerHTML = (data.files || [])
+            .map((f) => {
+              const qtyPart = f.total_quantity !== null && f.total_quantity !== undefined
+                ? ` &middot; Total Qty: <strong>${f.total_quantity}</strong>`
+                : "";
+              const slotBadge = f.slot_label && f.slot !== "files"
+                ? `<span class="badge badge-slot">${escapeHtml(f.slot_label)}</span>`
+                : "";
+              const hasOutputs = f.outputs && f.outputs.length > 0;
+              const blockClass = f.detected_format === "issuance_matrix"
+                ? "result-block issuance-highlight"
+                : "result-block";
+              const pillsHtml = hasOutputs
+                ? `<div class="download-pills">${renderDownloadPills(f.outputs)}</div>`
+                : `<div class="muted">Merged into CONSUMPTION_COMBINED_CLEANED above</div>`;
+              return `
+                <div class="${blockClass}">
+                  <div class="result-top">
+                    <span class="result-name">${escapeHtml(f.source_filename)}</span>
+                    <span>${slotBadge}<span class="badge badge-${escapeHtml(f.detected_format)}">${escapeHtml(f.format_label)}</span></span>
+                  </div>
+                  <div class="result-stats">
+                    Rows: <strong>${f.row_count}</strong> &middot;
+                    Items: <strong>${f.item_count}</strong>${qtyPart}
+                  </div>
+                  ${pillsHtml}
+                </div>
+              `;
+            })
+            .join("");
+
+          clearAllSlots();
+          await refreshOutputs();
+        } catch (err) {
+          cleanProgressWrap.classList.add("hidden");
+          resultsCard.classList.remove("hidden");
+          resultsKpis.classList.add("hidden");
+          resultsAlerts.innerHTML = `<div class="alert alert-error">Error: ${escapeHtml(err.message)}</div>`;
+        } finally {
+          btnClean.textContent = "Clean & Process Files";
+          btnClean.disabled = totalQueuedCount() === 0;
+        }
+      }
+
+      btnClean.addEventListener("click", cleanQueuedFiles);
+
+      async function openFolder(relativeFolder) {
+        try {
+          const resp = await fetch("/api/open_folder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ folder: relativeFolder || "" }),
+          });
+          const data = await resp.json();
+          if (!resp.ok || !data.ok) {
+            alert(data.error || "Failed to open folder.");
+          }
+        } catch (err) {
+          alert(`Could not open folder: ${err.message}`);
+        }
+      }
+
+      async function combineWholeMonth(monthFolder) {
+        if (!monthFolder) return;
+        setProgress(55, `Combining all daily files in ${monthFolder}...`, false);
+        try {
+          const resp = await fetch("/api/combine_month", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ month_folder: monthFolder }),
+          });
+          const data = await resp.json();
+          resultsCard.classList.remove("hidden");
+          resultsKpis.classList.add("hidden");
+          if (!resp.ok || !data.ok) {
+            cleanProgressWrap.classList.add("hidden");
+            resultsAlerts.innerHTML = `<div class="alert alert-error">${escapeHtml(data.error || "Month rollup failed.")}</div>`;
+            return;
+          }
+          setProgress(100, `Month rollup complete for ${data.month_folder}!`, true);
+          setTimeout(() => cleanProgressWrap.classList.add("hidden"), 2000);
+
+          lastTargetFolder = data.month_folder;
+          lastMonthFolder = data.month_folder;
+          resultsSubtitle.textContent = `Month Rollup in OUTPUT_CLEANED/${data.month_folder}/ (scanned ${data.scanned_folders} day(s))`;
+          btnResultZip.href = `/api/download_zip?folder=${encodeURIComponent(data.month_folder)}`;
+
+          const warnHtml = (data.warnings || [])
+            .map((w) => `<div class="alert alert-warn">${escapeHtml(w)}</div>`)
+            .join("");
+          resultsAlerts.innerHTML = warnHtml || `<div class="alert alert-success">Combined ${data.scanned_folders} day(s) for ${escapeHtml(data.month_folder)}.</div>`;
+          resultsCombined.innerHTML = renderCombinedCards(data.combined, "Monthly");
+          await refreshOutputs();
+        } catch (err) {
+          cleanProgressWrap.classList.add("hidden");
+          alert(`Month rollup failed: ${err.message}`);
+        }
+      }
+
+      btnOpenRoot.addEventListener("click", () => openFolder(""));
+      btnResultOpenFolder.addEventListener("click", () => openFolder(lastTargetFolder));
+      btnResultCombineMonth.addEventListener("click", () => combineWholeMonth(lastMonthFolder));
+      btnRefreshOutputs.addEventListener("click", refreshOutputs);
+
+      function renderFileLines(files) {
+        if (!files || files.length === 0) {
+          return `<div class="muted">No files</div>`;
+        }
+        return files
+          .map((f) => `
+            <div class="file-line">
+              <a href="/api/download_file?path=${encodeURIComponent(f.relative_path)}">${escapeHtml(f.name)}</a>
+              <span class="muted">${formatBytes(f.size_bytes)}</span>
+            </div>
+          `)
+          .join("");
+      }
+
+      async function refreshOutputs() {
+        try {
+          const resp = await fetch("/api/outputs");
+          const data = await resp.json();
+          const staleBanner = document.getElementById("staleServerBanner");
+          if (staleBanner) {
+            staleBanner.classList.toggle("hidden", data.backend_version === EXPECTED_BACKEND);
+          }
+          if (!data.ok) {
+            outputsTree.innerHTML = `<div class="alert alert-error">${escapeHtml(data.error || "Failed to load outputs.")}</div>`;
+            return;
+          }
+          outputRootLabel.textContent = data.output_root;
+          const months = data.months || [];
+          if (months.length === 0) {
+            outputsTree.innerHTML = `<p class="muted">No cleaned folders yet. Drop raw HIS files on the left to start.</p>`;
+            return;
+          }
+
+          outputsTree.innerHTML = months
+            .map((m) => `
+              <div class="explorer-month">
+                <div class="explorer-month-head">
+                  <span class="explorer-month-name">${escapeHtml(m.name)}</span>
+                  <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                    ${(m.can_combine_month || m.has_daily_subfolders) ? `<button type="button" class="btn btn-sm btn-teal" data-combine-month="${escapeHtml(m.name)}">Combine Month</button>` : ""}
+                    <a class="btn btn-sm" href="/api/download_zip?folder=${encodeURIComponent(m.relative_folder)}">ZIP</a>
+                    <button type="button" class="btn btn-sm" data-open-folder="${escapeHtml(m.relative_folder)}">Open</button>
+                  </div>
+                </div>
+                <div class="explorer-body">
+                  ${m.files.length ? renderFileLines(m.files) : ""}
+                  ${(m.subfolders || [])
+                    .map((sub) => `
+                      <div class="subfolder-box">
+                        <div class="subfolder-head">
+                          <span>${escapeHtml(sub.name)}</span>
+                          <div style="display:flex; gap:4px;">
+                            <a class="btn btn-sm" href="/api/download_zip?folder=${encodeURIComponent(sub.relative_folder)}">ZIP</a>
+                            <button type="button" class="btn btn-sm" data-open-folder="${escapeHtml(sub.relative_folder)}">Open</button>
+                          </div>
+                        </div>
+                        ${renderFileLines(sub.files)}
+                      </div>
+                    `)
+                    .join("")}
+                </div>
+              </div>
+            `)
+            .join("");
+
+          outputsTree.querySelectorAll("[data-open-folder]").forEach((btn) => {
+            btn.addEventListener("click", () => openFolder(btn.getAttribute("data-open-folder")));
+          });
+          outputsTree.querySelectorAll("[data-combine-month]").forEach((btn) => {
+            btn.addEventListener("click", () => combineWholeMonth(btn.getAttribute("data-combine-month")));
+          });
+        } catch (err) {
+          outputsTree.innerHTML = `<div class="alert alert-error">Error loading outputs: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+
+      initDates();
+      refreshOutputs();
+    })();
+  </script>
+</body>
+</html>
